@@ -66,12 +66,11 @@ following:
 * [CeleryKubernetes Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/celery_kubernetes.html)
 * [LocalKubernetes Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local_kubernetes.html)
 
-To facilitate the generation of Executor pods in Kubernetes clusters with RBAC enabled, it is essential to configure the 
-relevant service account with an appropriate role for the Spark Driver/Airflow Worker pod. The default assignment for 
-the Spark Driver/Airflow Worker pod is the airflow-worker Kubernetes service account. This service account is utilized 
-to interact with the Kubernetes API server for the creation and monitoring of executor pods. The service account 
-employed by the driver pod needs to possess the necessary permissions to execute its tasks. To achieve this, the 
-required role and role binding can be set up using the `pysparkonk8s-addon` Helm Chart available in this repository.
+To allow the creation of Executor pods in Kubernetes clusters with RBAC enabled, it is essential to configure the 
+the Spark Driver/Airflow Worker pod's service account with an appropriate role. 
+By default, the Spark Driver/Airflow Worker pod is assigned a Kubernetes service account named `airflow-worker`. This 
+service account is used to interact with the Kubernetes API server for the creation and monitoring of executor pods. 
+The required role and role binding can be set up using the `pysparkonk8s-addon` Helm Chart available in this repository.
 
 For an exhaustive list of dependencies please refer to the `pyproject.toml` file.
 
