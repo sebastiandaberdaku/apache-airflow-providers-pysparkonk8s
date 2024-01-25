@@ -1,0 +1,9 @@
+apiVersion: v2
+name: pysparkonk8s-addon
+description: Installs the required role and role-binding for the pysparkonk8s Apache Airflow provider.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Sebastian Daberdaku
+    email: sebastiandaberdaku@gmail.com

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dags
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadOnlyMany
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /mnt/airflow/dags
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: airflow
+  name: dags
+spec:
+  volumeName: dags
+  storageClassName: standard
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 5Gi
