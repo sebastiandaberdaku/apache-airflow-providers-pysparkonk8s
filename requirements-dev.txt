@@ -1,3 +1,1 @@
 pytest
-apache-airflow==2.8.1
-.
