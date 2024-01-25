@@ -70,7 +70,6 @@ purposes only.
 
 For our tests we will use SQLite. To initialize the SQLite database please execute the following commands:
 ```shell
-export AIRFLOW__CORE__LOAD_EXAMPLES=False
 export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
 airflow db migrate
 ```
@@ -86,6 +85,5 @@ The tests can be run with the following commands.
 ```shell
 export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
 export AIRFLOW_HOME=airflow_home
-export AIRFLOW__CORE__DAG_DISCOVERY_SAFE_MODE=False
 pytest .
 ```
