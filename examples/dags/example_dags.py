@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 import requests
 from airflow.decorators import dag, task
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
-from airflow.providers.pysparkonk8s.config import SparkBaseConf
-from pendulum import datetime
+from airflow.providers.pysparkonk8s.config import SparkBaseConf, SparkExecutorConf
+from pendulum import datetime, duration
 
 if TYPE_CHECKING:
     from pyspark.sql import SparkSession
@@ -52,6 +52,7 @@ def extract(url: str, s3_bucket: str) -> str:
 
 S3_ENDPOINT = "http://localstack.localstack.svc.cluster.local:4566"
 sbc = SparkBaseConf(jars=["com.amazonaws:aws-java-sdk-bundle:1.12.262", "org.apache.hadoop:hadoop-aws:3.3.4"])
+sec = SparkExecutorConf(instances=2)
 extra_conf = {
     "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
     "spark.hadoop.fs.s3a.endpoint": S3_ENDPOINT,
@@ -61,7 +62,7 @@ extra_conf = {
     "spark.hadoop.fs.s3a.secret.key": "bar",
 }
 
-@task.pyspark_on_k8s(spark_base_conf=sbc, spark_extra_conf=extra_conf)
+@task.pyspark_on_k8s(spark_base_conf=sbc, spark_executor_conf=sec, spark_extra_conf=extra_conf)
 def load(s3_bucket: str, s3_key: str, spark: "SparkSession") -> str:
     """
     Loads the given CSV file on S3 to parquet format.
@@ -87,6 +88,10 @@ def load(s3_bucket: str, s3_key: str, spark: "SparkSession") -> str:
         "url": "https://people.sc.fsu.edu/~jburkardt/data/csv/deniro.csv",
         "s3_bucket": "test-bucket",
         "region": "eu-central-1",
+    },
+    default_args={
+        "retries": 3,
+        "retry_delay": duration(minutes=5),
     }
 )
 def example_dag_1():
