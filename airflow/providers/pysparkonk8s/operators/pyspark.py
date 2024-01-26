@@ -33,8 +33,16 @@ class PySparkOnK8sOperator(PythonOperator):
         "spark_executor_conf": "json",
         "spark_extra_conf": "json"
     }
-    FOREST_GREEN = "#228b22"
-    ui_color = FOREST_GREEN
+    # Each operator should override this class attr for shallow copy attrs.
+    shallow_copy_attrs: Sequence[str] = tuple({
+        *PythonOperator.shallow_copy_attrs,
+        "spark_base_conf",
+        "spark_driver_conf",
+        "spark_executor_conf",
+        "spark_extra_conf",
+    })
+    EMERALD_GREEN = "#028A0F"
+    ui_color = EMERALD_GREEN
 
     def __init__(
             self,
@@ -55,7 +63,7 @@ class PySparkOnK8sOperator(PythonOperator):
 
         self.spark_conf: dict[str, str] = {}
 
-        if self.spark_base_conf.deploy_mode == SparkDeployMode.CLIENT:
+        if self.spark_base_conf.deploy_mode in (SparkDeployMode.LOCAL, SparkDeployMode.CLIENT):
             # Override Airflow Worker/Spark Driver Pod specification.
             # When using the KubernetesExecutor, Airflow offers the ability to override system defaults on a per-task
             # basis. To utilize this functionality, create a Kubernetes V1Pod object and fill in your desired overrides.
