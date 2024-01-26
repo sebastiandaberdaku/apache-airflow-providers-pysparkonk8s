@@ -54,7 +54,8 @@ functionalities [might not be supported](https://spark.apache.org/docs/latest/sp
 when using Spark Connect.
 
 ## Usage
-Examples are available in the `examples/dags/` folder.
+Several usage examples are available in the `examples/dags/` folder. Documentation on how to setup a local testing 
+environment with minikube are available [here](examples/README.md).
 
 ## Requirements
 The provider requires Apache Airflow v2.6.0 or later.
@@ -104,13 +105,15 @@ pinned version of apache-airflow that you have already installed. This precautio
 inadvertently upgraded or downgraded by pip during the process.
 
 ### Building Apache Airflow Docker images with the `pysparkonk8s` provider
-An example of how to build a Docker image with the `pysparkonk8s` provider is available in the `docker/` folder.
+An example of how to build a Docker image with the `pysparkonk8s` provider is available in the `docker/` folder. 
+See the related [documentation](docker/README.md) for more details.
 
 ### Installing `pysparkonk8s-addon`
 The `chart/` folder contains the `pysparkonk8s-addon` Helm Chart that installs the required role and role-binding 
 for the provider. 
 
 The `docs/` folder contains the compiled Helm package and serves it as a self-hosted Helm repository via GitHub Pages.
+See the related [documentation](docs/README.md) for more details.
 
 To install the addon in the `airflow` namespace use the following command:
 ```shell
