@@ -24,7 +24,7 @@ class SparkDeployMode(Enum):
 
 class Sentinel(Enum):
     """Nomen est omen"""
-    AUTODETECT = object()
+    AUTODETECT = "__AUTODETECT__"
 
 
 DEFAULT_KUBERNETES_API_URL = "k8s://https://kubernetes.default.svc.cluster.local:443"
