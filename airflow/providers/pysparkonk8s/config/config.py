@@ -64,6 +64,8 @@ class _CommonConf(_SparkConf, ABC):
         extra_java_options: A string of extra JVM options.
         extra_class_path: Extra classpath entries to prepend to the classpath.
         extra_library_path: Set a special library path to use when launching the driver JVM.
+        jars: A list of Maven coordinates of jars to include on the driver and executor classpaths. The coordinates
+            should be groupId:artifactId:version.
     """
     cores: CPU | None = None
     request_cores: CPU | None = CPU.cores(1)
@@ -77,6 +79,7 @@ class _CommonConf(_SparkConf, ABC):
     extra_java_options: str | None = "-XX:+ExitOnOutOfMemoryError"
     extra_class_path: str | None = "/opt/spark/jars/*"
     extra_library_path: str | None = "/opt/hadoop/lib/native"
+    jars: list | None = field(default_factory=list)
 
     @property
     @abstractmethod
@@ -122,6 +125,8 @@ class _CommonConf(_SparkConf, ABC):
             spark_conf[f"spark.{self._component}.extraClassPath"] = self.extra_class_path
         if self.extra_library_path is not None:
             spark_conf[f"spark.{self._component}.extraLibraryPath"] = self.extra_library_path
+        if self.jars:
+            spark_conf["spark.jars.packages"] = ",".join(self.jars)
         return spark_conf
 
 
