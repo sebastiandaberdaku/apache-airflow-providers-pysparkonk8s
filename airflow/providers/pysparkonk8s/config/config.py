@@ -64,8 +64,6 @@ class _CommonConf(_SparkConf, ABC):
         extra_java_options: A string of extra JVM options.
         extra_class_path: Extra classpath entries to prepend to the classpath.
         extra_library_path: Set a special library path to use when launching the driver JVM.
-        jars: A list of Maven coordinates of jars to include on the driver and executor classpaths. The coordinates
-            should be groupId:artifactId:version.
     """
     cores: CPU | None = None
     request_cores: CPU | None = CPU.cores(1)
@@ -79,7 +77,6 @@ class _CommonConf(_SparkConf, ABC):
     extra_java_options: str | None = "-XX:+ExitOnOutOfMemoryError"
     extra_class_path: str | None = "/opt/spark/jars/*"
     extra_library_path: str | None = "/opt/hadoop/lib/native"
-    jars: list | None = field(default_factory=list)
 
     @property
     @abstractmethod
@@ -125,8 +122,6 @@ class _CommonConf(_SparkConf, ABC):
             spark_conf[f"spark.{self._component}.extraClassPath"] = self.extra_class_path
         if self.extra_library_path is not None:
             spark_conf[f"spark.{self._component}.extraLibraryPath"] = self.extra_library_path
-        if self.jars:
-            spark_conf["spark.jars.packages"] = ",".join(self.jars)
         return spark_conf
 
 
@@ -157,6 +152,8 @@ class SparkBaseConf(_SparkConf):
         shuffle_file_buffer: Size of the in-memory buffer for each shuffle file output stream. These buffers reduce the
             number of disk seeks and system calls made in creating intermediate shuffle files. Sets the
             `spark.shuffle.file.buffer` Spark configuration.
+        jars: A list of Maven coordinates of jars to include on the driver and executor classpaths. The coordinates
+            should be groupId:artifactId:version.
     """
     deploy_mode: SparkDeployMode = SparkDeployMode.CLIENT
     spark_url: str | None = None
@@ -166,6 +163,7 @@ class SparkBaseConf(_SparkConf):
     image_pull_policy: Literal["Always", "Never", "IfNotPresent"] | None = "IfNotPresent"
     image_pull_secrets: str | None = None
     shuffle_file_buffer: Memory | None = Memory.mebibytes(1)
+    jars: list | None = field(default_factory=list)
 
     def get_namespace(self) -> str:
         return get_namespace() if self.kubernetes_namespace == Sentinel.AUTODETECT else self.kubernetes_namespace
@@ -193,6 +191,8 @@ class SparkBaseConf(_SparkConf):
             spark_conf[f"spark.kubernetes.container.image.pullPolicy"] = self.image_pull_policy
         if self.image_pull_secrets is not None:
             spark_conf[f"spark.kubernetes.container.image.pullSecrets"] = self.image_pull_secrets
+        if self.jars:
+            spark_conf["spark.jars.packages"] = ",".join(self.jars)
         return spark_conf
 
 
