@@ -1,17 +1,17 @@
 ARG AIRFLOW_VERSION=2.8.1
 ARG PYTHON_VERSION=3.10
-FROM apache/airflow:${AIRFLOW_VERSION}-python${PYTHON_VERSION}
+FROM apache/airflow:slim-${AIRFLOW_VERSION}-python${PYTHON_VERSION}
 
 USER root
-# INSTALL openjdk
+# INSTALL openjdk and ps
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openjdk-17-jre && \
+    apt-get install -y --no-install-recommends openjdk-17-jre procps && \
     rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 USER airflow
-# INSTALL other dependencies
+# INSTALL python dependencies
 WORKDIR /home/airflow
 COPY ./requirements.txt .
 

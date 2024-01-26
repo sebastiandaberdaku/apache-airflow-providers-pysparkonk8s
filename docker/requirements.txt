@@ -1,1 +1,3 @@
 https://github.com/sebastiandaberdaku/apache-airflow-providers-pysparkonk8s/archive/refs/heads/main.tar.gz
+apache-airflow-providers-amazon
+apache-airflow-providers-postgres
