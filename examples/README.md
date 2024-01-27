@@ -24,7 +24,7 @@ Mount the `examples/dags` inside the cluster. Navigate inside the `examples/` fo
 ```shell
 kubectl apply -f dags-volume.yaml
 ```
-This will setup a PersistentVolume of type `hostPath` for the `/mnt/airflow/dags` node path, and PersistentVolumeClaim
+This will set up a PersistentVolume of type `hostPath` for the `/mnt/airflow/dags` node path, and PersistentVolumeClaim
 `dags` that will be mounted as a persistent volume inside the Airflow Pods.
 
 In a separate, dedicated terminal run the following command:
@@ -79,10 +79,15 @@ To view the Airflow UI you can port-forward its webserver service like so:
 ```shell
 kubectl port-forward service/airflow-webserver 9090:8080 --namespace airflow
 ```
-and then access it in your browser on `http://localhost:9090` logging in with the default credentials `username=admin`, 
+and then access it in your browser on [http://localhost:9090](http://localhost:9090) logging in with the default credentials `username=admin`, 
 `password=admin`.
 
 Finally, stop minikube when you are done testing:
 ```shell
 minikube stop
+```
+
+Optionally, you can delete the created cluster and the `.minikube` folder from your user directory with the command:
+```shell
+minikube delete --purge
 ```

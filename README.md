@@ -1,6 +1,6 @@
 # apache-airflow-providers-pysparkonk8s
-This is a Python package for the `pysparkonk8s` [Apache Airflow](https://airflow.apache.org) provider. All classes for this provider are in the 
-`airflow.providers.pysparkonk8s` python package.
+This is a Python package for the `pysparkonk8s` [Apache Airflow](https://airflow.apache.org) provider. All classes for this provider are 
+located in the `airflow.providers.pysparkonk8s` python package.
 
 ## Description
 
@@ -25,13 +25,13 @@ and access to Airflow [Variables](https://airflow.apache.org/docs/apache-airflow
 [XComs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/xcoms.html#xcoms) from within the PySpark 
 code.
 
-The Worker pod's requests and limits are dynamically mutated by the provider to match the Spark Driver's configuration. 
+The Worker pod's **requests** and **limits** are dynamically mutated by the provider to match the Spark Driver's configuration. 
 The Spark Driver will then provision the Executor pods by communicating directly with the Kubernetes API. Once the 
-Airflow task is over, the Spark pods are destroyed and the relative provisioned resources are automatically released.
+Airflow task is over, the Spark pods are destroyed and the related provisioned resources are automatically released.
 
 #### Spark Pod placement
-To minimize networking bottlenecks and costs, Spark Executor Pods should be placed *close* to each other and possibly
-*close* to the Spark Driver. Unless otherwise specified, the `pysparkonk8s` provider will generate pod affinity rules
+To minimize networking bottlenecks and costs, Spark Executor Pods should be placed **close** to each other and possibly
+**close** to the Spark Driver. Unless otherwise specified, the `pysparkonk8s` provider will generate pod affinity rules
 to try to ensure the following pod placement:
 1. try to spawn executors on the same node as the driver pod;
 2. otherwise, try to spawn executors on the same node as the other executor pods;
@@ -39,7 +39,7 @@ to try to ensure the following pod placement:
 4. finally, try to spawn executors in the same availability zone as the other executor pods.
 
 These affinity rules are generated dynamically on a per-task basis, which means that concurrent Airflow PySpark Tasks 
-with their own Spark Drivers and Executors will not affect each-others pod placement.
+with their own Spark Drivers and Executors will not affect each other's pod placement.
 
 ### Running Spark in Local mode
 In `Local` mode, Spark runs both Driver and Executor components on a single JVM. It is the simplest mode of deployment and 
@@ -51,11 +51,73 @@ match the provided Spark configuration. No Executor pods will be instantiated in
 ### Running Spark in Connect mode
 The provider also supports running PySpark code on an existing Spark Connect cluster. Please be aware that some Spark
 functionalities [might not be supported](https://spark.apache.org/docs/latest/spark-connect-overview.html#what-is-supported-in-spark-34) 
-when using Spark Connect.
+when using Spark Connect. 
+
+In this scenario, the provider allows users to easily connect to an existing Sparck Connect cluster with minimal 
+configuration.
 
 ## Usage
-Several usage examples are available in the `examples/dags/` folder. Documentation on how to setup a local testing 
-environment with minikube are available [here](examples/README.md).
+The following example shows how to use the `@task.pyspark_on_k8s` decorator. Note that the **spark** argument is 
+injected by the decorator.
+```python
+from airflow.decorators import task
+from pyspark.sql import SparkSession, types as t
+
+@task.pyspark_on_k8s
+def spark_task(spark: SparkSession) -> None:
+    data = [
+        ("James", "", "Smith", "36636", "M", 3000),
+        ("Michael", "Rose", "", "40288", "M", 4000),
+        ("Robert", "", "Williams", "42114", "M", 4000),
+        ("Maria", "Anne", "Jones", "39192", "F", 4000),
+        ("Jen", "Mary", "Brown", "", "F", -1),
+    ]
+    schema = t.StructType([
+        t.StructField("firstname", t.StringType(), True),
+        t.StructField("middlename", t.StringType(), True),
+        t.StructField("lastname", t.StringType(), True),
+        t.StructField("id", t.StringType(), True),
+        t.StructField("gender", t.StringType(), True),
+        t.StructField("salary", t.IntegerType(), True),
+    ])
+    
+    df = spark.createDataFrame(data=data, schema=schema)
+    df.printSchema()
+    df.show()
+```
+
+Alternatively, tha same result can be achieved using the `PySparkOnK8sOperator`.
+
+```python
+from airflow.providers.pysparkonk8s.operators import PySparkOnK8sOperator
+from pyspark.sql import SparkSession, types as t
+
+def spark_task(spark: SparkSession) -> None:
+    data = [
+        ("James", "", "Smith", "36636", "M", 3000),
+        ("Michael", "Rose", "", "40288", "M", 4000),
+        ("Robert", "", "Williams", "42114", "M", 4000),
+        ("Maria", "Anne", "Jones", "39192", "F", 4000),
+        ("Jen", "Mary", "Brown", "", "F", -1),
+    ]
+    schema = t.StructType([
+        t.StructField("firstname", t.StringType(), True),
+        t.StructField("middlename", t.StringType(), True),
+        t.StructField("lastname", t.StringType(), True),
+        t.StructField("id", t.StringType(), True),
+        t.StructField("gender", t.StringType(), True),
+        t.StructField("salary", t.IntegerType(), True),
+    ])
+    
+    df = spark.createDataFrame(data=data, schema=schema)
+    df.printSchema()
+    df.show()
+
+pyspark_operator_task = PySparkOnK8sOperator(task_id="spark_task", python_callable=spark_task)
+```
+Several usage examples are available in the `examples/dags/` folder. 
+
+Instructions on how to set up a local testing environment with minikube are available [here](examples/README.md).
 
 ## Requirements
 The provider requires Apache Airflow v2.6.0 or later.
@@ -68,14 +130,16 @@ following:
 * [LocalKubernetes Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local_kubernetes.html)
 
 To allow the creation of Executor pods in Kubernetes clusters with RBAC enabled, it is essential to configure the 
-the Spark Driver/Airflow Worker pod's service account with an appropriate role. 
+Spark Driver/Airflow Worker pod's service account with an appropriate role.
+
 By default, the Spark Driver/Airflow Worker pod is assigned a Kubernetes service account named `airflow-worker`. This 
 service account is used to interact with the Kubernetes API server for the creation and monitoring of executor pods. 
 The required role and role binding can be set up using the `pysparkonk8s-addon` Helm Chart available in this repository.
 
-For an exhaustive list of dependencies please refer to the `pyproject.toml` file.
+For an exhaustive list of dependencies please refer to the [pyproject.toml](pyproject.toml) file.
 
-**Note:** This project was tested with Python version 3.10 and Apache Airflow version 2.8.1. 
+### Note 
+This project was tested with Python version 3.10 and Apache Airflow version 2.8.1. 
 
 ## Installation
 We set the following environment variables that will be used throughout the environment setup.
@@ -142,7 +206,7 @@ The project dependencies for testing are provided in the `requirements-dev.txt` 
 [Conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) for managing 
 the dependencies.
 
-Setup and activate Conda environment with the following command:
+Set up and activate Conda environment with the following command:
 ```shell
 conda create --name pysparkonk8s python=${PYTHON_VERSION} -y
 conda activate pysparkonk8s
