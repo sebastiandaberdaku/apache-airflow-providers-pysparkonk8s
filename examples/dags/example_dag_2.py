@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-@task()
+@task
 def create_bucket(s3_bucket: str, region: str) -> str:
     """
     Creates an S3 bucket if it does not already exist.
@@ -33,7 +33,7 @@ def create_bucket(s3_bucket: str, region: str) -> str:
         logger.info(f"S3 bucket {s3_bucket} already exists.")
     return s3_bucket
 
-@task()
+@task
 def extract(url: str, s3_bucket: str) -> str:
     """
     Downloads a file from the specified URL and uploads it to an S3 bucket.
