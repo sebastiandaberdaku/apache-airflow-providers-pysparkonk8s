@@ -75,6 +75,13 @@ helm upgrade --install localstack localstack/localstack \
   --create-namespace 
 ```
 
+To view the Airflow UI you can port-forward its webserver service like so:
+```shell
+kubectl port-forward service/airflow-webserver 9090:8080 --namespace airflow
+```
+and then access it in your browser on `http://localhost:9090` logging in with the default credentials `username=admin`, 
+`password=admin`.
+
 Finally, stop minikube when you are done testing:
 ```shell
 minikube stop
