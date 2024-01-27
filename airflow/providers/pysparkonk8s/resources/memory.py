@@ -220,3 +220,10 @@ class Memory:
 
     def __str__(self) -> str:
         return self.to_k8s_spec(unit=None)
+
+    def serialize(self) -> int:
+        return self.size_in_bytes
+
+    @staticmethod
+    def deserialize(data: int, version: int):
+        return Memory(value=data, unit=None)

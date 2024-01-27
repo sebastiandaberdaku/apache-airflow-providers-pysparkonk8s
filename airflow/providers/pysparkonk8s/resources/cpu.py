@@ -1,4 +1,4 @@
-from typing import TypeVar, Type, Sequence
+from typing import TypeVar, Type, Sequence, Any
 import re
 
 # Create a generic variable that can be of type "CPU", or any subclass.
@@ -84,3 +84,10 @@ class CPU:
 
     def __str__(self) -> str:
         return self.to_k8s_spec()
+
+    def serialize(self) -> int:
+        return self.m_cores
+
+    @staticmethod
+    def deserialize(data: int, version: int):
+        return CPU(m_cores=data)
