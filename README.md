@@ -57,8 +57,8 @@ In this scenario, the provider allows users to easily connect to an existing Spa
 configuration.
 
 ## Usage
-The following example shows how to use the `@task.pyspark_on_k8s` decorator. Note that the **spark** argument is 
-injected by the decorator.
+The following example shows how to use the `@task.pyspark_on_k8s` decorator. Note that the **spark** parameter (the 
+actual Spark Session) is injected by the decorator.
 ```python
 from airflow.decorators import task
 from pyspark.sql import SparkSession, types as t
