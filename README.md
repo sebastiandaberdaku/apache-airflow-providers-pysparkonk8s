@@ -86,7 +86,7 @@ def spark_task(spark: SparkSession) -> None:
     df.show()
 ```
 
-Alternatively, tha same result can be achieved using the `PySparkOnK8sOperator`.
+Alternatively, the same result can be achieved using the `PySparkOnK8sOperator`.
 
 ```python
 from airflow.providers.pysparkonk8s.operators import PySparkOnK8sOperator
