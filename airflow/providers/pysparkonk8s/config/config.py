@@ -1,10 +1,9 @@
 import os
 import uuid
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Literal
-from kubernetes.client import models as k8s
+from typing import Literal, Type, Any, cast
 
 from airflow.providers.pysparkonk8s.resources import CPU, Memory
 from airflow.providers.pysparkonk8s.utils import (
@@ -14,6 +13,7 @@ from airflow.providers.pysparkonk8s.utils import (
     get_hostname,
     get_ip,
 )
+from kubernetes.client import models as k8s
 
 
 class SparkDeployMode(Enum):
@@ -32,8 +32,40 @@ DEFAULT_SPARK_CONNECT_SERVER_URL = "sc://spark-connect.spark-connect.svc.cluster
 SPARK_DRIVER_AFFINITY_ID_LABEL = "spark-driver-affinity-id"
 SPARK_EXECUTOR_AFFINITY_ID_LABEL = "spark-executor-affinity-id"
 
+class AutoTemplateFieldsMeta(ABCMeta):
+    """Metaclass that adds an automatically generated *template_fields* class attribute to its members."""
+    def __new__(
+            cls: Type[ABCMeta],
+            name: str,
+            bases: tuple[Type, ...],
+            class_dict: dict[str, Any]
+    ) -> "AutoTemplateFieldsMeta":
+        """
+        This method is responsible for creating and returning the new class object.
 
-class _SparkConf(ABC):
+        :param name: the name of the new class being created
+        :param bases: a tuple of base classes for the new class
+        :param class_dict: a dictionary of attributes for the new class
+        :return: the new class object
+        """
+        # Get all the attribute names excluding methods, private members and properties from the current class
+        template_fields = {
+            attr for attr in class_dict if
+            not callable(class_dict[attr]) and
+            not attr.startswith("_") and
+            not isinstance(class_dict[attr], property)
+        }
+        # Traverse the MRO and collect template fields from parent classes
+        for base in bases:
+            if hasattr(base, "template_fields"):
+                template_fields.update(getattr(base, "template_fields"))
+        # Add the combined template fields as a class attribute
+        class_dict["template_fields"] = tuple(template_fields)
+        result = super().__new__(cls, name, bases, class_dict)
+        return cast(AutoTemplateFieldsMeta, result)
+
+
+class _SparkConf(metaclass=AutoTemplateFieldsMeta):
     """Abstract base class representing a Spark Session configuration management object."""
 
     @abstractmethod
@@ -47,7 +79,7 @@ class _SparkConf(ABC):
 
 
 @dataclass(kw_only=True)
-class _CommonConf(_SparkConf, ABC):
+class _CommonConf(_SparkConf):
     """
         cores: Specifies the total CPU cores to allow Spark applications to use on the machine. Sets the
             `spark.{driver|executor}.cores` Spark configuration.
@@ -197,7 +229,7 @@ class SparkBaseConf(_SparkConf):
 
 
 @dataclass(kw_only=True)
-class _K8sConf(_CommonConf, ABC):
+class _K8sConf(_CommonConf):
     """
     Represents the Kubernetes-relates configuration options for Spark driver and executor pods.
     """

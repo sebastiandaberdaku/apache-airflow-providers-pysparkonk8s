@@ -18,6 +18,32 @@ def spark_executor_conf():
     return SparkExecutorConf()
 
 
+def test_base_conf_template_fields():
+    assert set(SparkBaseConf.template_fields) == {
+        "deploy_mode", "spark_url", "kubernetes_namespace", "kubernetes_ca_cert_file", "kubernetes_oauth_token_file",
+        "image_pull_policy", "image_pull_secrets", "shuffle_file_buffer", "jars"
+    }
+
+
+def test_driver_conf_template_fields():
+    assert set(SparkDriverConf.template_fields) == {
+        "pod_affinity", "image", "volume_mounts", "node_selector", "memory_overhead", "environment_variables",
+        "pod_anti_affinity", "pod_labels", "extra_class_path", "memory", "cores", "tolerations", "extra_java_options",
+        "service_account_name", "volumes", "aws_role_arn", "containers", "node_affinity", "pod_name", "request_cores",
+        "extra_library_path", "host", "container_name", "memory_overhead_factor"
+    }
+
+def test_executor_conf_template_fields():
+    print(SparkExecutorConf.template_fields)
+    assert set(SparkExecutorConf.template_fields) == {
+        "node_affinity", "container_name", "memory_overhead", "request_cores", "service_account_name",
+        "pod_anti_affinity", "memory_overhead_factor", "pod_labels", "memory", "node_selector", "pod_affinity",
+        "aws_role_arn", "containers", "volumes", "extra_library_path", "dynamic_allocation_max_executors",
+        "volume_mounts", "instances", "extra_class_path", "tolerations", "cores", "environment_variables",
+        "extra_java_options", "dynamic_allocation_enabled", "image", "dynamic_allocation_min_executors"
+    }
+
+
 @pytest.mark.parametrize("config_key", [
     "spark.master",
     "spark.submit.deployMode",
