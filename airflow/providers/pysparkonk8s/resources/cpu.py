@@ -1,5 +1,5 @@
-from typing import TypeVar, Type, Sequence, Any
 import re
+from typing import TypeVar, Type
 
 # Create a generic variable that can be of type "CPU", or any subclass.
 C = TypeVar("C", bound="CPU")

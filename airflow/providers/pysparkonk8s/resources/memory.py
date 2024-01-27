@@ -1,7 +1,7 @@
 import re
 from abc import ABCMeta
 from enum import IntEnum, EnumMeta
-from typing import TypeVar, Type, Sequence
+from typing import TypeVar, Type
 
 # Create a generic variable that can be of type "Memory", or any subclass.
 M = TypeVar("M", bound="Memory")
