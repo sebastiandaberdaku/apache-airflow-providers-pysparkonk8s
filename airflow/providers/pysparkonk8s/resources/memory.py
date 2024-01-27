@@ -10,13 +10,18 @@ U = TypeVar("U", bound="Unit")
 
 
 class ABCEnumMeta(EnumMeta, ABCMeta):
+    """Metaclass for creating enumeration classes with both enum and abstract class features."""
     pass
 
 
 class Unit(IntEnum, metaclass=ABCEnumMeta):
+    """Abstract base class for defining memory units as Enum."""
 
     @classmethod
     def get_unit_pattern(cls: Type[U]) -> re.Pattern[str]:
+        """
+        Returns a compiled regular expression pattern for matching memory units.
+        """
         unit_names = [unit.name for unit in cls]
         unit_pattern = "|".join(unit_names)
         return re.compile(rf"^(?P<value>\d+\.?\d*|\d*\.?\d+)(?P<unit>{unit_pattern})?$")
@@ -75,10 +80,7 @@ class JvmUnit(Unit):
 
 
 class Memory:
-    """
-    Represents a memory size and provides conversion methods between Kubernetes and JVM memory specifications.
-    """
-    template_fields: Sequence[str] = ("size_in_bytes",)
+    """Represents a memory resource and provides conversion methods between Kubernetes and JVM specifications."""
 
     def __init__(self, value: int | float, unit: Unit | None = None) -> None:
         """
@@ -105,24 +107,52 @@ class Memory:
         self.size_in_bytes: int = size_in_bytes
 
     def __add__(self: M, other: M) -> M:
+        """
+        Adds two Memory objects together.
+
+        :param Memory other: The Memory object to be added.
+        :return: A new Memory object representing the sum of the two memories.
+        :raises TypeError: If the provided operand is not a Memory object.
+        """
         if isinstance(other, Memory):
             return Memory(value=self.size_in_bytes + other.size_in_bytes, unit=None)
         else:
             raise TypeError("Unsupported operand type for \"+\"!")
 
     def __mul__(self: M, other: int | float) -> M:
+        """
+        Multiplies the Memory object by a scalar.
+
+        :param float|int other: The scalar value to multiply by.
+        :return: A new Memory object representing the result of the multiplication.
+        :raises TypeError: If the provided operand is not a float or int.
+        """
         if isinstance(other, (int, float)):
             return Memory(value=self.size_in_bytes * other)
         else:
             raise TypeError("Unsupported operand type for \"*\"!")
 
     def __eq__(self: M, other: M) -> bool:
+        """
+        Compares two Memory objects for equality.
+
+        :param Memory other: The Memory object to compare with.
+        :return: True if the memories are equal, False otherwise.
+        :raises TypeError: If the provided operand is not a Memory object.
+        """
         if isinstance(other, Memory):
             return self.size_in_bytes == other.size_in_bytes
         else:
             raise TypeError("Unsupported operand type for \"==\"!")
 
     def __lt__(self: M, other: M) -> bool:
+        """
+        Compares two Memory objects.
+
+        :param Memory other: The Memory object to compare with.
+        :return: True if the current memory is less than the other, False otherwise.
+        :raises TypeError: If the provided operand is not a Memory object.
+        """
         if isinstance(other, Memory):
             return self.size_in_bytes < other.size_in_bytes
         else:
@@ -130,18 +160,42 @@ class Memory:
 
     @classmethod
     def gibibytes(cls: Type[M], value: float) -> M:
+        """
+        Creates a Memory object with the specified value in gibibytes.
+
+        :param float value: The value in gibibytes.
+        :return: A new Memory object representing the specified value in gibibytes.
+        """
         return cls(value=value, unit=K8sUnit.Gi)
 
     @classmethod
     def gigabytes(cls: Type[M], value: float) -> M:
+        """
+        Creates a Memory object with the specified value in gigabytes.
+
+        :param float value: The value in gigabytes.
+        :return: A new Memory object representing the specified value in gigabytes.
+        """
         return cls(value=value, unit=K8sUnit.G)
 
     @classmethod
     def mebibytes(cls: Type[M], value: float) -> M:
+        """
+        Creates a Memory object with the specified value in mebibytes.
+
+        :param float value: The value in mebibytes.
+        :return: A new Memory object representing the specified value in mebibytes.
+        """
         return cls(value=value, unit=K8sUnit.Mi)
 
     @classmethod
     def megabytes(cls: Type[M], value: float) -> M:
+        """
+        Creates a Memory object with the specified value in megabytes.
+
+        :param float value: The value in megabytes.
+        :return: A new Memory object representing the specified value in megabytes.
+        """
         return cls(value=value, unit=K8sUnit.M)
 
     @classmethod
@@ -219,11 +273,27 @@ class Memory:
         return f"{value}{unit.name}"
 
     def __str__(self) -> str:
+        """
+        Returns a string representation of the Memory object in Kubernetes specification format.
+
+        :return: The string representation of the Memory object.
+        """
         return self.to_k8s_spec(unit=None)
 
     def serialize(self) -> int:
+        """
+        Method used by Airflow to serialize a Memory object.
+        :return: The serialized Memory object (i.e. its size in bytes).
+        """
         return self.size_in_bytes
 
     @staticmethod
     def deserialize(data: int, version: int):
+        """
+        Method used by Airflow to deserialize a Memory object.
+
+        :param data: The serialized object representation (i.e. its size in bytes).
+        :param version: The object version information (not used in this implementation).
+        :return: The deserialized Memory object.
+        """
         return Memory(value=data, unit=None)
