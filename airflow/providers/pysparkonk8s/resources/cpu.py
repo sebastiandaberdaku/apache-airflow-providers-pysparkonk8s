@@ -1,4 +1,4 @@
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Sequence
 import re
 
 # Create a generic variable that can be of type "CPU", or any subclass.
@@ -6,6 +6,8 @@ C = TypeVar("C", bound="CPU")
 
 
 class CPU:
+    template_fields: Sequence[str] = ("m_cores",)
+
     def __init__(self: C, m_cores: int) -> None:
         if type(m_cores) is not int:
             raise TypeError("\"milli_cores\"'s type must be int!")

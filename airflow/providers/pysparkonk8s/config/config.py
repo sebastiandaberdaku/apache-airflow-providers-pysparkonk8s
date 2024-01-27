@@ -17,6 +17,7 @@ from kubernetes.client import models as k8s
 
 
 class SparkDeployMode(Enum):
+    """Nomen est omen"""
     LOCAL = "local"
     CLIENT = "client"
     CONNECT = "connect"
@@ -33,7 +34,13 @@ SPARK_DRIVER_AFFINITY_ID_LABEL = "spark-driver-affinity-id"
 SPARK_EXECUTOR_AFFINITY_ID_LABEL = "spark-executor-affinity-id"
 
 class AutoTemplateFieldsMeta(ABCMeta):
-    """Metaclass that adds an automatically generated *template_fields* class attribute to its members."""
+    """
+    Metaclass that adds an automatically generated *template_fields* class attribute to its members.
+
+    *template_fields* are used by Airflow when resolving Jinja templates. Airflow considers the field names present in
+    template_fields for templating while rendering the operator.
+    """
+
     def __new__(
             cls: Type[ABCMeta],
             name: str,
@@ -232,6 +239,20 @@ class SparkBaseConf(_SparkConf):
 class _K8sConf(_CommonConf):
     """
     Represents the Kubernetes-relates configuration options for Spark driver and executor pods.
+
+    Inherits from `_CommonConf` and includes additional Kubernetes-specific configuration options.
+
+    Attributes:
+        tolerations: List of Kubernetes tolerations for pod scheduling.
+        node_selector: Dictionary representing Kubernetes node selector labels for pod scheduling.
+        node_affinity: Kubernetes node affinity rules for pod scheduling.
+        pod_affinity: Kubernetes pod affinity rules for pod scheduling.
+        pod_anti_affinity: Kubernetes pod anti-affinity rules for pod scheduling.
+        containers` List of Kubernetes container specifications for the pod.
+        volumes: List of Kubernetes volume specifications for the pod.
+        volume_mounts: List of Kubernetes volume mount specifications for the pod.
+        environment_variables: List of Kubernetes environment variables for the pod.
+        pod_labels: Dictionary representing additional Kubernetes labels for the pod.
     """
     __doc__ += _CommonConf.__doc__
 

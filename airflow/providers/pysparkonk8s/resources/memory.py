@@ -1,7 +1,7 @@
 import re
 from abc import ABCMeta
 from enum import IntEnum, EnumMeta
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Sequence
 
 # Create a generic variable that can be of type "Memory", or any subclass.
 M = TypeVar("M", bound="Memory")
@@ -78,6 +78,7 @@ class Memory:
     """
     Represents a memory size and provides conversion methods between Kubernetes and JVM memory specifications.
     """
+    template_fields: Sequence[str] = ("size_in_bytes",)
 
     def __init__(self, value: int | float, unit: Unit | None = None) -> None:
         """
