@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 from airflow.providers.pysparkonk8s.config import SparkDeployMode, SparkBaseConf
 from airflow.providers.pysparkonk8s.operators import PySparkOnK8sOperator
 from kubernetes.client import models as k8s
@@ -41,7 +43,8 @@ def test_pyspark_on_k8s_operator_render_spark_conf():
         "spark.driver.extraClassPath": "/opt/spark/jars/*",
         "spark.driver.extraLibraryPath": "/opt/hadoop/lib/native",
         "spark.kubernetes.driver.pod.name": "sebastian-ThinkPad-X1-Carbon-Gen-10",
-        "spark.driver.host": "192.168.1.16", "spark.kubernetes.executor.request.cores": "1000m",
+        "spark.driver.host": ANY,
+        "spark.kubernetes.executor.request.cores": "1000m",
         "spark.executor.memory": "1024m",
         "spark.kubernetes.executor.container.image": "spark:3.5.0-scala2.12-java17-python3-ubuntu",
         "spark.kubernetes.executor.podTemplateContainerName": "spark",
@@ -88,7 +91,8 @@ def test_pyspark_on_k8s_operator_conf_override():
         "spark.driver.extraClassPath": "/opt/spark/jars/*",
         "spark.driver.extraLibraryPath": "/opt/hadoop/lib/native",
         "spark.kubernetes.driver.pod.name": "sebastian-ThinkPad-X1-Carbon-Gen-10",
-        "spark.driver.host": "192.168.1.16", "spark.kubernetes.executor.request.cores": "1000m",
+        "spark.driver.host": ANY,
+        "spark.kubernetes.executor.request.cores": "1000m",
         "spark.executor.memory": "1024m",
         "spark.kubernetes.executor.container.image": "spark:3.5.0-scala2.12-java17-python3-ubuntu",
         "spark.kubernetes.executor.podTemplateContainerName": "spark",

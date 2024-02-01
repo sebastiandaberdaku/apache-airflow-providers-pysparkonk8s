@@ -1,2 +1,3 @@
 pytest
+coverage
 apache-airflow-providers-amazon

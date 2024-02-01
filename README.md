@@ -253,3 +253,14 @@ export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
 export AIRFLOW_HOME=airflow_home
 pytest tests/
 ```
+
+### Running the tests with *coverage*
+To run the tests with **coverage** make sure you install the provider with the `--editable` flag. 
+The test coverage can then be computed by running the following commands.
+
+```shell
+export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
+export AIRFLOW_HOME=airflow_home
+coverage run --source=./airflow -m pytest tests/
+coverage report
+```
