@@ -4,8 +4,7 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from airflow.decorators import dag, task
-from airflow.decorators.base import Task, FReturn
-from airflow.decorators.task_group import FParams
+from airflow.decorators.base import Task, FParams, FReturn
 from airflow.providers.pysparkonk8s.config import SparkExecutorConf
 from pendulum import datetime, duration
 
