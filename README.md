@@ -191,7 +191,7 @@ Ensure that your testing environment has:
 * Airflow 2.6.0 or later. You can check your version by running `airflow version`.
 * All provider packages that your DAG uses.
 * An initialized Airflow metadata database, if your DAG uses elements of the metadata database like XComs. The Airflow 
-metadata database is created when Airflow is first run in an environment. You can check that it exists with `airflow db 
+metadata database is created when Airflow is first run in an environment. You can check that it exists with `airflow db
 check` and initialize a new database with `airflow db migrate` (`airflow db init` in Airflow versions pre-2.7).
 
 ### Cloning the project from GitHub
